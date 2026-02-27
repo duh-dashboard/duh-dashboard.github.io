@@ -85,6 +85,7 @@
     }
     .btn:hover { opacity: 0.88; text-decoration: none; transform: translateY(-1px); }
     .btn-primary { background: var(--primary); color: #0a0e17; }
+    .btn-green   { background: var(--green);   color: #0a0e17; }
     .btn-outline {
       background: transparent; color: var(--text);
       border: 1px solid var(--border);
@@ -160,14 +161,31 @@
 
     /* ── Install ──────────────────────────────────────────────────────── */
     #install { background: var(--surface); }
-    .install-steps {
+    .install-tracks {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem; margin-top: 3rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem; margin-top: 3rem;
+      align-items: start;
     }
+    @media (max-width: 700px) { .install-tracks { grid-template-columns: 1fr; } }
+    .install-track-head {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .install-track-head h3 { font-size: 1.05rem; font-weight: 700; }
+    .track-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+    }
+    .track-badge-blue { background: rgba(96,165,250,0.15); color: var(--primary); }
+    .track-badge-green { background: rgba(52,211,153,0.15); color: var(--green); }
     .step {
-      display: flex; gap: 1rem;
+      display: flex; gap: 1rem; margin-bottom: 1.25rem;
     }
+    .step:last-child { margin-bottom: 0; }
     .step-num {
       flex-shrink: 0;
       width: 32px; height: 32px;
@@ -176,6 +194,10 @@
       color: var(--primary);
       font-weight: 700; font-size: 0.9rem;
       display: flex; align-items: center; justify-content: center;
+    }
+    .step-num-green {
+      background: rgba(52,211,153,0.15);
+      color: var(--green);
     }
     .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
     .step p { color: var(--muted); font-size: 0.875rem; }
@@ -308,6 +330,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/></svg>
         Download AppImage
       </a>
+      <a class="btn btn-green" href="https://github.com/duh-dashboard/dashboard/releases">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/></svg>
+        Download Flatpak
+      </a>
       <a class="btn btn-outline" href="https://github.com/duh-dashboard/dashboard">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
         View on GitHub
@@ -328,7 +354,7 @@
       </span>
       <span class="badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Single AppImage — no install needed
+        AppImage &amp; Flatpak releases
       </span>
     </div>
   </div>
@@ -388,8 +414,8 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon">📦</div>
-        <h3>Zero-install AppImage</h3>
-        <p>Download one file, mark it executable, and run. All 12 widgets and Qt libraries are bundled — no dependencies to manage.</p>
+        <h3>AppImage &amp; Flatpak</h3>
+        <p>AppImage: one portable file, no install needed. Flatpak: sandboxed and integrated with GNOME/KDE Software. Both bundle all 12 widgets and Qt.</p>
       </div>
     </div>
   </div>
@@ -510,30 +536,69 @@
   <div class="container">
     <p class="section-label">Getting started</p>
     <h2>Up and running in seconds</h2>
-    <div class="install-steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>
-          <h3>Download the AppImage</h3>
-          <p>Grab the latest <code>Dashboard-*.AppImage</code> from the <a href="https://github.com/duh-dashboard/dashboard/releases">releases page</a>.</p>
+    <p class="subtitle">Choose the format that fits your workflow. Both are available on the <a href="https://github.com/duh-dashboard/dashboard/releases">releases page</a>.</p>
+    <div class="install-tracks">
+
+      <!-- AppImage track -->
+      <div>
+        <div class="install-track-head">
+          <h3>AppImage</h3>
+          <span class="track-badge track-badge-blue">Portable</span>
+        </div>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h3>Download</h3>
+            <p>Grab <code>Dashboard-*.AppImage</code> from the <a href="https://github.com/duh-dashboard/dashboard/releases">releases page</a>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h3>Make it executable</h3>
+            <pre><code>chmod +x Dashboard-*.AppImage</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h3>Run</h3>
+            <p>Double-click, or from the terminal:</p>
+            <pre><code>./Dashboard-*.AppImage</code></pre>
+          </div>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <h3>Make it executable</h3>
-          <p>Open a terminal and run:</p>
-          <pre><code>chmod +x Dashboard-*.AppImage</code></pre>
+
+      <!-- Flatpak track -->
+      <div>
+        <div class="install-track-head">
+          <h3>Flatpak</h3>
+          <span class="track-badge track-badge-green">Sandboxed</span>
+        </div>
+        <div class="step">
+          <div class="step-num step-num-green">1</div>
+          <div>
+            <h3>Download</h3>
+            <p>Grab <code>Dashboard-*.flatpak</code> from the <a href="https://github.com/duh-dashboard/dashboard/releases">releases page</a>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num step-num-green">2</div>
+          <div>
+            <h3>Install</h3>
+            <pre><code>flatpak install Dashboard-*.flatpak</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num step-num-green">3</div>
+          <div>
+            <h3>Run</h3>
+            <p>From your app launcher, or from the terminal:</p>
+            <pre><code>flatpak run io.github.duh_dashboard.Dashboard</code></pre>
+          </div>
         </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <h3>Launch</h3>
-          <p>Double-click the file, or from the terminal:</p>
-          <pre><code>./Dashboard-*.AppImage</code></pre>
-        </div>
-      </div>
+
     </div>
   </div>
 </section>

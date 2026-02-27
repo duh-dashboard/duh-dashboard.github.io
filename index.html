@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Customizable Widget Desktop for Linux</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0e17;
+      --surface:   #111827;
+      --surface2:  #1a2233;
+      --border:    #1f2d44;
+      --primary:   #60a5fa;
+      --green:     #34d399;
+      --text:      #f1f5f9;
+      --muted:     #8b9ab3;
+      --radius:    10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ──────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10, 14, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-weight: 700; font-size: 1.1rem; color: var(--text);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nav-logo svg { color: var(--primary); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); font-size: 0.9rem; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── Sections ─────────────────────────────────────────────────────── */
+    section { padding: 5rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--primary); margin-bottom: 0.75rem;
+    }
+    h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .subtitle { color: var(--muted); font-size: 1.1rem; max-width: 600px; }
+
+    /* ── Hero ─────────────────────────────────────────────────────────── */
+    #hero {
+      padding: 7rem 2rem 6rem;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(96,165,250,0.12), transparent);
+    }
+    #hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800; line-height: 1.2;
+      margin-bottom: 1.25rem;
+    }
+    #hero h1 span { color: var(--primary); }
+    #hero p {
+      color: var(--muted); font-size: 1.15rem;
+      max-width: 600px; margin: 0 auto 2.5rem;
+    }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem; border-radius: var(--radius);
+      font-size: 0.95rem; font-weight: 600; transition: opacity 0.2s, transform 0.1s;
+      cursor: pointer; border: none;
+    }
+    .btn:hover { opacity: 0.88; text-decoration: none; transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); color: #0a0e17; }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--primary); }
+
+    .hero-badges {
+      margin-top: 3rem;
+      display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+    }
+    .badge {
+      display: flex; align-items: center; gap: 0.4rem;
+      color: var(--muted); font-size: 0.85rem;
+    }
+    .badge svg { color: var(--green); }
+
+    /* ── Features ─────────────────────────────────────────────────────── */
+    #features { background: var(--surface); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(96,165,250,0.12);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem; font-size: 1.3rem;
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .feature-card p { color: var(--muted); font-size: 0.9rem; }
+
+    /* ── Widgets ──────────────────────────────────────────────────────── */
+    #widgets {}
+    .widgets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .widget-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .widget-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .widget-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+    .widget-icon { font-size: 1.4rem; }
+    .widget-card h3 { font-size: 0.95rem; font-weight: 600; }
+    .widget-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+    .widget-tag {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.15rem 0.6rem;
+      background: rgba(96,165,250,0.1);
+      color: var(--primary);
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+
+    /* ── Install ──────────────────────────────────────────────────────── */
+    #install { background: var(--surface); }
+    .install-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .step {
+      display: flex; gap: 1rem;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(96,165,250,0.15);
+      color: var(--primary);
+      font-weight: 700; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .step p { color: var(--muted); font-size: 0.875rem; }
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.85em;
+      background: rgba(96,165,250,0.08);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1em 0.4em;
+      color: var(--primary);
+    }
+
+    pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    pre code {
+      background: none; border: none; padding: 0;
+      color: #e2e8f0; font-size: 0.875rem;
+    }
+
+    /* ── Developers ───────────────────────────────────────────────────── */
+    #developers {}
+    .dev-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem; margin-top: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 720px) { .dev-grid { grid-template-columns: 1fr; } }
+    .dev-grid h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem; }
+    .dev-grid p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+
+    /* ── Repos ────────────────────────────────────────────────────────── */
+    #repos { background: var(--surface); }
+    .repos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem; margin-top: 2.5rem;
+    }
+    .repo-link {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text); font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+    .repo-link:hover { border-color: var(--primary); text-decoration: none; }
+    .repo-link svg { color: var(--muted); flex-shrink: 0; }
+
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────────────────── -->
+<nav>
+  <span class="nav-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </span>
+  <ul class="nav-links">
+    <li><a href="#widgets">Widgets</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#developers">Developers</a></li>
+    <li><a href="https://github.com/duh-dashboard">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="container">
+    <h1>Your desktop.<br><span>Your widgets.</span></h1>
+    <p>A customizable widget-based desktop dashboard for Linux. Drop in plugins, arrange them freely, and make your desktop work for you.</p>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="https://github.com/duh-dashboard/dashboard/releases">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/></svg>
+        Download AppImage
+      </a>
+      <a class="btn btn-outline" href="https://github.com/duh-dashboard/dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <div class="hero-badges">
+      <span class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Linux native (Qt 6)
+      </span>
+      <span class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        12 built-in widgets
+      </span>
+      <span class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Plugin SDK for custom widgets
+      </span>
+      <span class="badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Single AppImage — no install needed
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ──────────────────────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <p class="section-label">Why Dashboard</p>
+    <h2>Built for flexibility</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧩</div>
+        <h3>Runtime plugin system</h3>
+        <p>Drop a <code>.so</code> into the <code>plugins/</code> directory and it appears instantly in the Add Widget dialog — no restart needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖱️</div>
+        <h3>Free-form canvas</h3>
+        <p>Drag and resize widget cards anywhere on screen. Layout and widget state persist automatically across restarts.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Customizable appearance</h3>
+        <p>Frameless window with a custom title bar. Set a solid background color with opacity or use your own wallpaper image.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3>Zero-install AppImage</h3>
+        <p>Download one file, mark it executable, and run. All 12 widgets and Qt libraries are bundled — no dependencies to manage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Widgets ────────────────────────────────────────────────────────────── -->
+<section id="widgets">
+  <div class="container">
+    <p class="section-label">Built-in widgets</p>
+    <h2>12 widgets, ready to use</h2>
+    <p class="subtitle">Every widget is a standalone plugin with its own repository. Mix and match, or build your own.</p>
+    <div class="widgets-grid">
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">🕐</span>
+          <h3>Clock</h3>
+        </div>
+        <p>Current time (HH:MM:SS) updated every second.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">📅</span>
+          <h3>Calendar</h3>
+        </div>
+        <p>Monthly calendar with dark styling and keyboard navigation.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">✅</span>
+          <h3>Todo</h3>
+        </div>
+        <p>Persistent checklist — add items with Enter, right-click to delete.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">📝</span>
+          <h3>Notes</h3>
+        </div>
+        <p>Sticky note backed by a plain text editor. Content saved automatically.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">🍅</span>
+          <h3>Pomodoro</h3>
+        </div>
+        <p>25 min / 5 min focus timer. Pause state survives restarts.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">⏳</span>
+          <h3>Countdown</h3>
+        </div>
+        <p>Days remaining to a user-specified target date with a configurable label.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">🔗</span>
+          <h3>Links</h3>
+        </div>
+        <p>Editable bookmark list. Click a link to open it in your default browser.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">🌤️</span>
+          <h3>Weather</h3>
+        </div>
+        <p>Current conditions from Open-Meteo — no API key required. Search by city, toggle °C / °F.</p>
+        <span class="widget-tag">No API key</span>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">📊</span>
+          <h3>System Status</h3>
+        </div>
+        <p>Live CPU%, memory%, disk%, and network rates read from <code>/proc</code>.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">⚙️</span>
+          <h3>Htop</h3>
+        </div>
+        <p>Per-core CPU bars, memory bar, and a sorted process table.</p>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">🤖</span>
+          <h3>AI Chat</h3>
+        </div>
+        <p>Multi-turn chat via the OpenAI API. Configurable model, system prompt, and API key.</p>
+        <span class="widget-tag">OpenAI API</span>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-header">
+          <span class="widget-icon">📋</span>
+          <h3>Log Tail</h3>
+        </div>
+        <p>Tail any log file or the systemd journal with a configurable unit filter and line buffer.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Install ────────────────────────────────────────────────────────────── -->
+<section id="install">
+  <div class="container">
+    <p class="section-label">Getting started</p>
+    <h2>Up and running in seconds</h2>
+    <div class="install-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h3>Download the AppImage</h3>
+          <p>Grab the latest <code>Dashboard-*.AppImage</code> from the <a href="https://github.com/duh-dashboard/dashboard/releases">releases page</a>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h3>Make it executable</h3>
+          <p>Open a terminal and run:</p>
+          <pre><code>chmod +x Dashboard-*.AppImage</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h3>Launch</h3>
+          <p>Double-click the file, or from the terminal:</p>
+          <pre><code>./Dashboard-*.AppImage</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Developers ─────────────────────────────────────────────────────────── -->
+<section id="developers">
+  <div class="container">
+    <p class="section-label">For developers</p>
+    <h2>Build your own widget</h2>
+    <p class="subtitle">Any shared library that implements <code>IWidget</code> is a valid plugin. The SDK handles the rest.</p>
+    <div class="dev-grid">
+      <div>
+        <h3>Quick start</h3>
+        <p>Install the SDK and use the scaffolding script to generate a complete widget skeleton:</p>
+        <pre><code># Install widget-sdk
+cmake -S widget-sdk -B build/sdk \
+  -DCMAKE_INSTALL_PREFIX=~/.local
+cmake --build build/sdk
+cmake --install build/sdk
+
+# Generate boilerplate
+python3 widget-sdk/create-widget.py my-widget</code></pre>
+        <p style="margin-top:1rem;">This produces a fully self-contained CMake project ready to build and load into Dashboard.</p>
+      </div>
+      <div>
+        <h3>The IWidget interface</h3>
+        <p>Implement three methods and you have a working widget:</p>
+        <pre><code>class MyWidget : public QWidget,
+                 public IWidget {
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID IWidget_iid
+                    FILE "my-widget.json")
+  Q_INTERFACES(IWidget)
+public:
+  QString name() const override;
+  QWidget* createWidget(
+    WidgetContext*, QWidget* parent
+  ) override;
+  void saveState(QJsonObject&) override;
+  void loadState(const QJsonObject&) override;
+};</code></pre>
+        <p style="margin-top:1rem;">See the full guide in the <a href="https://github.com/duh-dashboard/widget-sdk">widget-sdk repository</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Repos ──────────────────────────────────────────────────────────────── -->
+<section id="repos">
+  <div class="container">
+    <p class="section-label">Source code</p>
+    <h2>All repositories</h2>
+    <div class="repos-grid">
+
+      <a class="repo-link" href="https://github.com/duh-dashboard/dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        dashboard
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/widget-sdk">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        widget-sdk
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/clock">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        clock
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/calendar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        calendar
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/todo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        todo
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/weather">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        weather
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/system-status">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        system-status
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/notes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        notes
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/pomodoro">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        pomodoro
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/countdown">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        countdown
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/openai-chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        openai-chat
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/links">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        links
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/htop">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        htop
+      </a>
+      <a class="repo-link" href="https://github.com/duh-dashboard/logtail">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.607.069-.607 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        logtail
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <p>
+    Released under the <a href="https://github.com/duh-dashboard/dashboard/blob/main/LICENSE">GPL-3.0 License</a> &nbsp;·&nbsp;
+    <a href="https://github.com/duh-dashboard">github.com/duh-dashboard</a>
+  </p>
+</footer>
+
+</body>
+</html>

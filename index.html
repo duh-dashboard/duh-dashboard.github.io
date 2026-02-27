@@ -234,6 +234,41 @@
     .repo-link:hover { border-color: var(--primary); text-decoration: none; }
     .repo-link svg { color: var(--muted); flex-shrink: 0; }
 
+    /* ── Preview ─────────────────────────────────────────────────────── */
+    #preview {
+      padding: 0 2rem 5rem;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(96,165,250,0.05), transparent);
+    }
+    .preview-main-wrap {
+      max-width: 1020px;
+      margin: 0 auto 2.5rem;
+    }
+    .preview-main-wrap img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+      display: block;
+    }
+    .preview-shots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 1020px;
+      margin: 0 auto;
+    }
+    .preview-shot img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      display: block;
+      margin-bottom: 0.85rem;
+    }
+    .preview-shot h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .preview-shot p  { font-size: 0.875rem; color: var(--muted); line-height: 1.55; }
+    @media (max-width: 640px) { .preview-shots { grid-template-columns: 1fr; } }
+
     /* ── Footer ───────────────────────────────────────────────────────── */
     footer {
       border-top: 1px solid var(--border);
@@ -255,6 +290,7 @@
     Dashboard
   </span>
   <ul class="nav-links">
+    <li><a href="#preview">Preview</a></li>
     <li><a href="#widgets">Widgets</a></li>
     <li><a href="#install">Install</a></li>
     <li><a href="#developers">Developers</a></li>
@@ -294,6 +330,37 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Single AppImage — no install needed
       </span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Preview ───────────────────────────────────────────────────────────── -->
+<section id="preview">
+  <div class="preview-main-wrap">
+    <img
+      src="images/screenshot-overview.png"
+      alt="Dashboard running with clock, calendar, weather, pomodoro, system status, htop, AI chat, links, todo, and logtail widgets"
+      loading="lazy"
+    >
+  </div>
+  <div class="preview-shots">
+    <div class="preview-shot">
+      <img
+        src="images/screenshot-canvas.png"
+        alt="Dashboard canvas with multiple widgets arranged freely"
+        loading="lazy"
+      >
+      <h4>Arrange widgets your way</h4>
+      <p>Drag any widget card to reposition it, grab its edge to resize. The canvas remembers your layout and restores it exactly on next launch.</p>
+    </div>
+    <div class="preview-shot">
+      <img
+        src="images/screenshot-add-widget.png"
+        alt="Add Widget dialog listing all available plugins including AI Chat, Calendar, Clock, Countdown, Links, Notes, Pomodoro, System Status, and more"
+        loading="lazy"
+      >
+      <h4>Add widgets instantly</h4>
+      <p>Click Add Widget to see every installed plugin. Drop a <code>.so</code> into the <code>plugins/</code> folder and it shows up here immediately — no restart required.</p>
     </div>
   </div>
 </section>
